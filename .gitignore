@@ -1,0 +1,12 @@
+# ansible
+*.retry
+
+# vagrant
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.log
+.vagrant/
+
+# Just in case 😉
+files/universal.ovpn
+

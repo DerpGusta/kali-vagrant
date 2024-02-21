@@ -1,0 +1,121 @@
+---
+- name: Setup tmux and cookiecutter
+  become: true
+  become_method: ansible.builtin.sudo
+  hosts: all
+  vars:
+    home_dir: "/home/{{ user }}"
+    user: vagrant
+    apt_packages:
+      - neovim
+      - tmux
+      - pipx
+  tasks:
+    - name: Configure apt sources.list to use Cloudflare mirror
+      ansible.builtin.replace:
+        path: /etc/apt/sources.list
+        regexp: '^(deb\s+)http://([A-Za-z0-9.-]+)(/kali.*)$'
+        replace: '\1http://kali.download\3'
+
+    - name: Setup apt packages
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: latest
+        update_cache: true
+        autoremove: true
+        autoclean: true
+        cache_valid_time: 86400
+      loop: "{{apt_packages}}"
+
+    - name: Setup tmux plugin manager
+      ansible.builtin.git:
+        clone: true
+        repo: https://github.com/tmux-plugins/tpm.git
+        dest: "{{ home_dir }}/.tmux/plugins/tpm"
+        update: true
+      become: true
+      become_user: "{{ user }}"
+
+    - name: Copy the tmux config
+      ansible.builtin.copy:
+        src: "./files/tmux/tmux.conf"
+        dest: "{{ home_dir }}/.tmux.conf"
+        owner: "{{ user }}"
+        force: true
+        mode: "0644"
+
+    - name: Create Pipx home directory
+      ansible.builtin.file:
+        path: /usr/local/share/pipx
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install cookiecutter and tmuxp
+      community.general.pipx:
+        name: "{{ item }}"
+        state: latest
+      environment:
+        PIPX_HOME: /usr/local/share/pipx
+        PIPX_BIN_DIR: /usr/local/bin
+      loop:
+        - cookiecutter
+        - tmuxp
+
+    - name: Download cookiecutter template
+      ansible.builtin.git:
+        repo: https://github.com/DerpGusta/cookiecutter-pentest.git
+        clone: true
+        depth: 1
+        dest: "{{ home_dir }}/cookiecutter-pentest"
+      become: true
+      become_user: "{{ user }}"
+
+    - name: Setup default project
+      ansible.builtin.command:
+        cmd: "cookiecutter cookiecutter-pentest --no-input"
+        creates: "{{ home_dir }}/default"
+      become_user: "{{ user }}"
+
+    - name: Setup vpn profile
+      ansible.builtin.copy:
+        src: files/universal.ovpn
+        dest: "{{ home_dir }}"
+        mode: "0644"
+        owner: "{{ user }}"
+
+    - name: Setting up required directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      loop:
+        - "{{ home_dir }}/.config/qterminal.org/"
+        - "{{ home_dir }}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+    - name: Setup terminal settings
+      ansible.builtin.copy:
+        src: "./files/qterminal.ini"
+        dest: "{{ home_dir}}/.config/qterminal.org/"
+        force: true
+        mode: "0644"
+        owner: "{{ user }}"
+    - name: Setup xfce specific settings
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ home_dir}}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+        force: true
+        mode: "0644"
+        owner: "{{ user }}"
+      loop:
+        - "./files/xsettings.xml"
+        - "./files/xfce4-power-manager.xml"
+    - name: Setup env vars
+      ansible.builtin.lineinfile:
+        path: "{{ home_dir }}/.zshrc"
+        regexp: ".*LANG=C.UTF-8.*"
+        line: |
+          export LANG=C.UTF-8
+        state: present
