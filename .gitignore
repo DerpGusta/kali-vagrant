@@ -8,5 +8,5 @@
 .vagrant/
 
 # Just in case 😉
-files/universal.ovpn
+files/*.ovpn
 

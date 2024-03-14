@@ -10,6 +10,12 @@
       - neovim
       - tmux
       - pipx
+      - gobuster
+      - feroxbuster
+      - seclists
+      - zoxide
+      - webext-foxyproxy
+      - webext-ublock-origin-firefox
   tasks:
     - name: Configure apt sources.list to use Cloudflare mirror
       ansible.builtin.replace:
@@ -24,17 +30,16 @@
         update_cache: true
         autoremove: true
         autoclean: true
-        cache_valid_time: 86400
       loop: "{{apt_packages}}"
 
-    - name: Setup tmux plugin manager
-      ansible.builtin.git:
-        clone: true
-        repo: https://github.com/tmux-plugins/tpm.git
-        dest: "{{ home_dir }}/.tmux/plugins/tpm"
-        update: true
-      become: true
-      become_user: "{{ user }}"
+    # - name: Setup tmux plugin manager
+    #   ansible.builtin.git:
+    #     clone: true
+    #     repo: https://github.com/tmux-plugins/tpm.git
+    #     dest: "{{ home_dir }}/.tmux/plugins/tpm"
+    #     update: true
+    #   become: true
+    #   become_user: "{{ user }}"
 
     - name: Copy the tmux config
       ansible.builtin.copy:
@@ -43,6 +48,14 @@
         owner: "{{ user }}"
         force: true
         mode: "0644"
+
+    - name: Create tmux log directory
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.tmux-logs"
+        state: directory
+        owner: "{{ user }}"
+        group:  "{{ user }}"
+        mode: "0755"
 
     - name: Create Pipx home directory
       ansible.builtin.file:
@@ -80,10 +93,13 @@
 
     - name: Setup vpn profile
       ansible.builtin.copy:
-        src: files/universal.ovpn
+        src: "{{ item }}"
         dest: "{{ home_dir }}"
         mode: "0644"
         owner: "{{ user }}"
+      loop:
+        - "files/universal.ovpn" # Offsec
+        - "files/academy-regular.ovpn" # HTB
 
     - name: Setting up required directories
       ansible.builtin.file:
@@ -118,4 +134,11 @@
         regexp: ".*LANG=C.UTF-8.*"
         line: |
           export LANG=C.UTF-8
+        state: present
+    - name: Setup zoxide shell config
+      ansible.builtin.lineinfile:
+        path: "{{ home_dir }}/.zshrc"
+        regexp: ".*zoxide init zsh.*" 
+        line: |
+          eval "$(zoxide init zsh)"
         state: present
