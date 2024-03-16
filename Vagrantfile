@@ -13,9 +13,12 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "kalilinux/rolling"
+  config.vm.box_version = "2024.1.0"
 
   config.vm.define "kali"
 
+  config.ssh.forward_agent = true
+  config.ssh.forward_x11 = true
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.

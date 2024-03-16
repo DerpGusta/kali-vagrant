@@ -16,6 +16,7 @@
       - zoxide
       - webext-foxyproxy
       - webext-ublock-origin-firefox
+      - exploitdb
   tasks:
     - name: Configure apt sources.list to use Cloudflare mirror
       ansible.builtin.replace:
