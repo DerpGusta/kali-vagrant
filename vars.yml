@@ -14,4 +14,3 @@ apt_packages:
   - wine32
   - shellter
   - veil
-  - naabu

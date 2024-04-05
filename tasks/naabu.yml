@@ -1,0 +1,8 @@
+---
+- name: Download the release and setup naabu
+  ansible.builtin.unarchive:
+    remote_src: true
+    # Hard-coded URL because I didn't see an easy way to bypass the github REST API rate limits
+    src: "https://github.com/projectdiscovery/naabu/releases/download/v2.3.0/naabu_2.3.0_linux_amd64.zip"
+    dest: "/usr/local/bin"
+    keep_newer: true

@@ -9,7 +9,7 @@
     home_dir: "/home/{{ user }}"
     user: vagrant
   tasks:
-    - ansible.builtin.import_tasks: apt.yml
+    - ansible.builtin.import_tasks: tasks/apt.yml
     # - name: Setup tmux plugin manager
     #   ansible.builtin.git:
     #     clone: true
@@ -120,3 +120,4 @@
         line: |
           eval "$(zoxide init zsh)"
         state: present
+    - ansible.builtin.import_tasks: tasks/naabu.yml
