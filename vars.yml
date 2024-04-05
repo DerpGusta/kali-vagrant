@@ -1,0 +1,17 @@
+apt_packages:
+  - neovim
+  - tmux
+  - pipx
+  - gobuster
+  - feroxbuster
+  - seclists
+  - zoxide
+  - webext-foxyproxy
+  - webext-ublock-origin-firefox
+  - exploitdb
+  - remmina
+  - wine
+  - wine32
+  - shellter
+  - veil
+  - naabu

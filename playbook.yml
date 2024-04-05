@@ -1,38 +1,15 @@
 ---
-- name: Setup tmux and cookiecutter
+- name: Setup Kali VM with my preferred toolset
   become: true
   become_method: ansible.builtin.sudo
   hosts: all
+  vars_files:
+    - vars.yml
   vars:
     home_dir: "/home/{{ user }}"
     user: vagrant
-    apt_packages:
-      - neovim
-      - tmux
-      - pipx
-      - gobuster
-      - feroxbuster
-      - seclists
-      - zoxide
-      - webext-foxyproxy
-      - webext-ublock-origin-firefox
-      - exploitdb
   tasks:
-    - name: Configure apt sources.list to use Cloudflare mirror
-      ansible.builtin.replace:
-        path: /etc/apt/sources.list
-        regexp: '^(deb\s+)http://([A-Za-z0-9.-]+)(/kali.*)$'
-        replace: '\1http://kali.download\3'
-
-    - name: Setup apt packages
-      ansible.builtin.apt:
-        name: "{{ item }}"
-        state: latest
-        update_cache: true
-        autoremove: true
-        autoclean: true
-      loop: "{{apt_packages}}"
-
+    - ansible.builtin.import_tasks: apt.yml
     # - name: Setup tmux plugin manager
     #   ansible.builtin.git:
     #     clone: true

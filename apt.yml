@@ -1,0 +1,20 @@
+---
+- name: Configure apt sources.list to use Cloudflare mirror
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: '^(deb\s+)http://([A-Za-z0-9.-]+)(/kali.*)$'
+    replace: '\1http://kali.download\3'
+
+- name: Enable i386 package support
+  ansible.builtin.lineinfile:
+    dest: /var/lib/dpkg/arch
+    line: i386
+    create: yes
+
+- name: Setup apt packages
+  ansible.builtin.apt:
+    name: "{{apt_packages}}"
+    state: latest
+    update_cache: true
+    autoremove: true
+    autoclean: true
