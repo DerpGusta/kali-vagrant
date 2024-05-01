@@ -9,12 +9,13 @@
   ansible.builtin.lineinfile:
     dest: /var/lib/dpkg/arch
     line: i386
-    create: yes
+    create: true
+    mode: "0644"
 
 - name: Setup apt packages
   ansible.builtin.apt:
-    name: "{{apt_packages}}"
-    state: latest
+    name: "{{ apt_packages }}"
+    state: present
     update_cache: true
     autoremove: true
     autoclean: true

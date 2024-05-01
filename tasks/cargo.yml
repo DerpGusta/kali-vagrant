@@ -1,0 +1,11 @@
+---
+- name: Adding cargo to PATH
+  ansible.builtin.lineinfile:
+    path: "{{ home_dir }}/.zshrc"
+    state: present
+    line: "export PATH=$PATH:/home/vagrant/.cargo/bin"
+
+- name: Install Rustscan using cargo
+  community.general.cargo:
+    name: rustscan
+  become_user: "{{ user }}"

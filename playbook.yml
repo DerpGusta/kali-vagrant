@@ -10,15 +10,10 @@
     user: vagrant
   tasks:
     - ansible.builtin.import_tasks: tasks/apt.yml
-    # - name: Setup tmux plugin manager
-    #   ansible.builtin.git:
-    #     clone: true
-    #     repo: https://github.com/tmux-plugins/tpm.git
-    #     dest: "{{ home_dir }}/.tmux/plugins/tpm"
-    #     update: true
-    #   become: true
-    #   become_user: "{{ user }}"
-
+    - name: Setup nvim as default editor
+      community.general.alternatives:
+        name: editor
+        path: "/usr/bin/nvim"
     - name: Copy the tmux config
       ansible.builtin.copy:
         src: "./files/tmux/tmux.conf"
@@ -26,7 +21,6 @@
         owner: "{{ user }}"
         force: true
         mode: "0644"
-
     - name: Create tmux log directory
       ansible.builtin.file:
         path: "{{ home_dir }}/.tmux-logs"
@@ -53,6 +47,7 @@
       loop:
         - cookiecutter
         - tmuxp
+        - pwncat-cs
 
     - name: Download cookiecutter template
       ansible.builtin.git:
@@ -116,8 +111,10 @@
     - name: Setup zoxide shell config
       ansible.builtin.lineinfile:
         path: "{{ home_dir }}/.zshrc"
-        regexp: ".*zoxide init zsh.*" 
+        regexp: ".*zoxide init zsh.*"
         line: |
           eval "$(zoxide init zsh)"
         state: present
     - ansible.builtin.import_tasks: tasks/naabu.yml
+    - ansible.builtin.import_tasks: tasks/gem.yml
+    - ansible.builtin.import_tasks: tasks/cargo.yml

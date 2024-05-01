@@ -1,0 +1,17 @@
+---
+- name: Adding Gem bin dir to PATH
+  ansible.builtin.blockinfile:
+    path: "{{ home_dir }}/.zshrc"
+    state: present
+    block: |
+      if which ruby >/dev/null && which gem >/dev/null; then
+          PATH="$(ruby -r rubygems -e 'puts Gem.user_dir')/bin:$PATH"
+      fi
+
+- name: Install latest version of haiti (hash identifier)
+  community.general.gem:
+    name: haiti-hash
+    state: latest
+    user_install: true
+  become_user: "{{ user }}"
+  become: true
