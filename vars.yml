@@ -1,7 +1,7 @@
 apt_packages:
   - neovim
-  - tmux
   - pipx
+  - python3.12-venv
   - gobuster
   - feroxbuster
   - seclists
@@ -15,3 +15,14 @@ apt_packages:
   - shellter
   - veil
   - cargo
+  - jq
+  - kali-community-wallpapers
+  - fzf
+  - mingw-w64
+  - peass
+  - chisel
+  - ligolo-ng
+  - ncat
+  - i3
+  - obsidian
+  - ripgrep

@@ -10,10 +10,23 @@
     user: vagrant
   tasks:
     - ansible.builtin.import_tasks: tasks/apt.yml
+
+    - name: Set timezone to Asia/Kolkata
+      community.general.timezone:
+        name: Asia/Kolkata
+
+    - name: Setup i3 as default desktop selection
+      community.general.alternatives:
+        name: x-session-manager
+        path: "/usr/bin/i3"
+      tags:
+        - i3
+
     - name: Setup nvim as default editor
       community.general.alternatives:
         name: editor
         path: "/usr/bin/nvim"
+
     - name: Copy the tmux config
       ansible.builtin.copy:
         src: "./files/tmux/tmux.conf"
@@ -21,6 +34,7 @@
         owner: "{{ user }}"
         force: true
         mode: "0644"
+
     - name: Create tmux log directory
       ansible.builtin.file:
         path: "{{ home_dir }}/.tmux-logs"
@@ -55,7 +69,6 @@
         clone: true
         depth: 1
         dest: "{{ home_dir }}/cookiecutter-pentest"
-      become: true
       become_user: "{{ user }}"
 
     - name: Setup default project
@@ -84,6 +97,31 @@
       loop:
         - "{{ home_dir }}/.config/qterminal.org/"
         - "{{ home_dir }}/.config/xfce4/xfconf/xfce-perchannel-xml/"
+        - "{{ home_dir }}/.config/i3/"
+      tags:
+        - i3
+
+    - name: Copy the .Xresources file
+      ansible.builtin.copy:
+        src: "./files/.Xresources"
+        dest: "{{ home_dir }}/.Xresources"
+        owner: "{{ user }}"
+        force: true
+        mode: "0644"
+
+    - name: Copy the i3 config
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ home_dir }}/.config/i3/"
+        owner: "{{ user }}"
+        force: true
+        mode: "0644"
+      loop:
+        - "files/i3/config"
+        - "files/i3/i3status.conf"
+      tags:
+        - i3
+
     - name: Setup terminal settings
       ansible.builtin.copy:
         src: "./files/qterminal.ini"
@@ -115,6 +153,14 @@
         line: |
           eval "$(zoxide init zsh)"
         state: present
+    # - name: Setup wallpaper
+    #   community.general.xfconf:
+    #     property: "/backdrop/screen0/monitorVirtual1/workspace0/last-image"
+    #     channel: "xfce4-desktop"
+    #     value_type: "string"
+    #     value: "/usr/share/backgrounds/kali-community/red-kali-2021-2-3840x2160.png"
+    #   become:
+    #   become_user: "{{ user }}"
     - ansible.builtin.import_tasks: tasks/naabu.yml
     - ansible.builtin.import_tasks: tasks/gem.yml
     - ansible.builtin.import_tasks: tasks/cargo.yml
