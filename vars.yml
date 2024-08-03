@@ -26,3 +26,6 @@ apt_packages:
   - i3
   - obsidian
   - ripgrep
+  - fdfind
+  - podman
+  - podman-compose
